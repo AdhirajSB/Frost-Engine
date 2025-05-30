@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: clang++ build active file",
+			"command": "/usr/bin/clang++",
+			"args": [
+				"-std=c++17",
+				"-fcolor-diagnostics",
+				"-Wall",
+				"-fansi-escape-codes",
+				"-g",
+				"-DIMGUI_DEFINE_MATH_OPERATORS",
+				"-I${workspaceFolder}/dependencies/include",
+				"-L${workspaceFolder}/dependencies/library",
+				
+
+				"${workspaceFolder}/dependencies/include/ImGUI/imgui.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/imgui_widgets.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/imgui_draw.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/imgui_tables.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/imgui_impl_glfw.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/imgui_impl_opengl3.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/imgui_demo.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/ImGuiFileDialog.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/ImGuizmo.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/ImGradient.cpp",
+				"${workspaceFolder}/dependencies/include/ImGUI/ImCurveEdit.cpp",
+				"${workspaceFolder}/dependencies/include/stb_image/stb_image.cpp",
+				"${workspaceFolder}/dependencies/include/stb_image/stb_image_write.cpp",
+				
+				"${workspaceFolder}/src/main.cpp",
+				"${workspaceFolder}/src/window.cpp",
+				"${workspaceFolder}/src/engine.cpp",
+				"-o",
+				"${workspaceFolder}/app",
+				
+				"-lGLEW",
+				"-lglfw",
+				"-framework", "OpenGL",
+				"-framework", "Cocoa",
+				"-framework", "IOKit",
+				"-framework", "CoreVideo",
+				"-framework", "CoreFoundation",
+				"-Wno-deprecated"
+			],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"detail": "compiler: /usr/bin/clang++"
+		}
+	]
+}
