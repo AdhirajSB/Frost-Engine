@@ -1,11 +1,11 @@
 #include "engine.h"
-#include "vendor/tinyfiledialogs.h"
 
 Engine::Engine(const std::string& title){
     m_Window = new Window(1600, 900, title);
     m_Shader = new Shader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
     m_ModelManager = new ModelManager;
     m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f));
+    m_Gui = new GUI(m_Window->GetWindow());
 }
 
 Engine::~Engine(){
@@ -13,6 +13,7 @@ Engine::~Engine(){
     delete m_Shader;
     delete m_ModelManager;
     delete m_Camera;
+    delete m_Gui;
 }
 
 
@@ -32,6 +33,7 @@ void Engine::Loop(){
         // Draw everything
         m_Camera->Update(deltaTime);
         Render();
+        m_Gui->Render(m_ModelManager);
 
         m_Window->SwapBuffers();
         m_Window->Poll();
@@ -47,18 +49,5 @@ void Engine::Render(){
     m_Shader->Use();
     m_Shader->SetMat4("view", m_Camera->ViewMatrix());
     m_Shader->SetMat4("projection", m_Camera->ProjectionMatrix((float)m_Width/m_Height));
-    
-    if (glfwGetKey(m_Window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS){
-        const char* filename = tinyfd_openFileDialog(
-            "Open a wavefront file",
-            "",
-            0,
-            NULL,
-            NULL,
-            0
-        );
-
-        if (filename) m_ModelManager->AddModel(filename);
-    }
     m_ModelManager->DrawAll(*m_Shader);
 }

@@ -5,6 +5,7 @@
 #include "shader.h"
 #include "modelManager.h"
 #include "camera.h"
+#include "gui.h"
 
 class Engine{
     private:
@@ -12,6 +13,7 @@ class Engine{
     Shader* m_Shader;
     ModelManager* m_ModelManager;
     Camera* m_Camera;
+    GUI* m_Gui;
     
     int m_Width;
     int m_Height;

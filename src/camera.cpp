@@ -1,4 +1,5 @@
 #include "camera.h"
+#include <iostream>
 
 Camera::Camera(GLFWwindow *window, glm::vec3 cameraPos): m_Window(window), m_Position(cameraPos){
     m_Up = m_WorldUp;
@@ -10,7 +11,10 @@ Camera::Camera(GLFWwindow *window, glm::vec3 cameraPos): m_Window(window), m_Pos
 
 void Camera::Update(float deltaTime){
     const float velocity = m_Speed * deltaTime;
-
+    
+    // Calculate Right here so that it isnt NULL when keyboard input comes before mouse
+    m_Right = glm::cross(m_Direction, m_WorldUp);
+    
     if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS){
         m_Position += glm::normalize(m_Direction) * velocity;
     }
@@ -62,6 +66,5 @@ void MouseMovement(GLFWwindow *window, double xPos, double yPos){
     direction.z = sin(glm::radians(cam->m_Yaw)) * cos(glm::radians(cam->m_Pitch));
 
     cam->m_Direction = glm::normalize(direction);
-    cam->m_Right = glm::normalize(glm::cross(cam->m_Direction, cam->m_WorldUp));
     cam->m_Up = glm::normalize(glm::normalize(glm::cross(cam->m_Right, cam->m_Direction)));
 }
