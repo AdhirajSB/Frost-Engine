@@ -2,8 +2,21 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"label": "Compile C files",
+			"type": "shell",
+			"command": "clang",
+			"args": [
+				"-c",
+				"${workspaceFolder}/src/vendor/tinyfiledialogs.c",
+				"-o",
+				"${workspaceFolder}/src/vendor/tinyfiledialogs.o"
+			],
+			"problemMatcher": []
+		},
+		{
 			"type": "cppbuild",
 			"label": "C/C++: clang++ build active file",
+			"dependsOn": ["Compile C files"],
 			"command": "/usr/bin/clang++",
 			"args": [
 				"-std=c++17",
@@ -30,6 +43,8 @@
 				"${workspaceFolder}/dependencies/include/stb_image/stb_image.cpp",
 				"${workspaceFolder}/dependencies/include/stb_image/stb_image_write.cpp",
 				
+				"${workspaceFolder}/src/vendor/tinyfiledialogs.o",
+
 				"${workspaceFolder}/src/main.cpp",
 				"${workspaceFolder}/src/window.cpp",
 				"${workspaceFolder}/src/engine.cpp",
