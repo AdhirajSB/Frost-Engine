@@ -3,14 +3,14 @@
 
 #include "window.h"
 #include "shader.h"
-#include "model.h"
+#include "modelManager.h"
 #include "camera.h"
 
 class Engine{
     private:
     Window* m_Window;
     Shader* m_Shader;
-    Model* m_Model;
+    ModelManager* m_ModelManager;
     Camera* m_Camera;
     
     int m_Width;

@@ -50,6 +50,7 @@
 				"${workspaceFolder}/src/engine.cpp",
 				"${workspaceFolder}/src/model.cpp",
 				"${workspaceFolder}/src/camera.cpp",
+				"${workspaceFolder}/src/modelManager.cpp",
 				"-o",
 				"${workspaceFolder}/app",
 				

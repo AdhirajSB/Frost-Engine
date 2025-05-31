@@ -4,14 +4,14 @@
 Engine::Engine(const std::string& title){
     m_Window = new Window(1600, 900, title);
     m_Shader = new Shader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
-    m_Model = new Model("res/sampleModels/LaraCroft/Head.obj");
+    m_ModelManager = new ModelManager;
     m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f));
 }
 
 Engine::~Engine(){
     delete m_Window;
     delete m_Shader;
-    delete m_Model;
+    delete m_ModelManager;
     delete m_Camera;
 }
 
@@ -45,8 +45,20 @@ void Engine::Render(){
 
 
     m_Shader->Use();
-    m_Shader->SetMat4("model", glm::mat4(1.0f));
     m_Shader->SetMat4("view", m_Camera->ViewMatrix());
     m_Shader->SetMat4("projection", m_Camera->ProjectionMatrix((float)m_Width/m_Height));
-    m_Model->Draw();
+    
+    if (glfwGetKey(m_Window->GetWindow(), GLFW_KEY_SPACE) == GLFW_PRESS){
+        const char* filename = tinyfd_openFileDialog(
+            "Open a wavefront file",
+            "",
+            0,
+            NULL,
+            NULL,
+            0
+        );
+
+        if (filename) m_ModelManager->AddModel(filename);
+    }
+    m_ModelManager->DrawAll(*m_Shader);
 }
