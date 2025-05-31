@@ -13,6 +13,11 @@ class Window{
     Window(int width, int height, const std::string& title);
     ~Window();
 
+    
+    inline GLFWwindow* GetWindow() const{
+        return m_Window;
+    }
+
     bool ShouldClose() const{
         return glfwWindowShouldClose(m_Window);
     }

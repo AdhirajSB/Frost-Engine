@@ -33,6 +33,8 @@
 				"${workspaceFolder}/src/main.cpp",
 				"${workspaceFolder}/src/window.cpp",
 				"${workspaceFolder}/src/engine.cpp",
+				"${workspaceFolder}/src/model.cpp",
+				"${workspaceFolder}/src/camera.cpp",
 				"-o",
 				"${workspaceFolder}/app",
 				

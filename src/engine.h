@@ -2,10 +2,17 @@
 #define ENGINE_H
 
 #include "window.h"
+#include "shader.h"
+#include "model.h"
+#include "camera.h"
 
 class Engine{
     private:
     Window* m_Window;
+    Shader* m_Shader;
+    Model* m_Model;
+    Camera* m_Camera;
+    
     int m_Width;
     int m_Height;
 
@@ -13,7 +20,7 @@ class Engine{
     void Render(); 
 
     public:
-    Engine(int width, int height, const std::string& title);
+    Engine(const std::string& title);
     ~Engine();
 
     void Loop();
