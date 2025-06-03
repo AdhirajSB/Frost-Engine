@@ -10,6 +10,7 @@ class ModelManager{
     std::vector<glm::mat4> modelMats;
 
     public:
+    ModelManager();
     void AddModel(const std::string& objPath);
     void DrawAll(Shader& shader);
 };

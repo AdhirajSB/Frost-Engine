@@ -4,7 +4,7 @@ Engine::Engine(const std::string& title){
     m_Window = new Window(1600, 900, title);
     m_Shader = new Shader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
     m_ModelManager = new ModelManager;
-    m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f));
+    m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 0.8f, -3.0f));
     m_Gui = new GUI(m_Window->GetWindow());
 }
 
@@ -23,7 +23,7 @@ void Engine::Loop(){
     float lastFrame = 0.0f;
 
     while (!m_Window->ShouldClose()){
-        m_Window->ClearColor(0.0, 0.0, 0.0);
+        m_Window->ClearColor(0.1, 0.1, 0.1);
 
         // Evaluate deltaTime for camera movements
         float currFrame = static_cast<float>(glfwGetTime());
