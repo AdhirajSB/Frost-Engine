@@ -1,8 +1,8 @@
 #version 410 core
 
 uniform uint objectID;
-out uvec3 FragColor;
+out uint FragColor;
 
 void main(){
-    FragColor = uvec3(objectID, 0, 0);
+    FragColor = objectID;
 }

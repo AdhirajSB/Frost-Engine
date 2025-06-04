@@ -7,5 +7,14 @@ uniform mat4 view;
 uniform mat4 projection;
 
 void main(){
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
+    float scale = 1.02;
+
+    // Manual scaling matrix
+    mat4 scaleMat = mat4(
+        vec4(scale, 0.0,   0.0,   0.0),
+        vec4(0.0,   scale, 0.0,   0.0),
+        vec4(0.0,   0.0,   scale, 0.0),
+        vec4(0.0,   0.0,   0.0,   1.0)
+    );
+    gl_Position = projection * view * model * scaleMat * vec4(aPos, 1.0);
 }

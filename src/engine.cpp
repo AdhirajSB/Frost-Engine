@@ -6,7 +6,7 @@ Engine::Engine(const std::string& title){
     m_PickShader = new Shader("res/shaders/objInfoVS.glsl", "res/shaders/objInfoFS.glsl");
     m_OutlineShader = new Shader("res/shaders/outlineVS.glsl", "res/shaders/outlineFS.glsl");
     m_ModelManager = new ModelManager;
-    m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 0.8f, -3.0f));
+    m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 1.2f, -5.0f));
     m_Gui = new GUI(m_Window->GetWindow());
 }
 
@@ -71,10 +71,10 @@ void Engine::Render(){
         mouseY *= (double)m_Height/winHeight;
 
         glReadBuffer(GL_COLOR_ATTACHMENT0);
-        unsigned int pixel[3] = {};
-        glReadPixels(mouseX, m_Height - mouseY, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &pixel);
+        unsigned int pixel;
+        glReadPixels(mouseX, m_Height - mouseY, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &pixel);
 
-        m_ModelManager->selectedModel = (size_t)pixel[0];
+        m_ModelManager->selectedModel = (size_t)pixel;
         m_ModelManager->DisablePicking();
     }
 
