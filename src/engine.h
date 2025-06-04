@@ -20,6 +20,9 @@ class Engine{
     int m_Width;
     int m_Height;
 
+    glm::mat4 m_View;
+    glm::mat4 m_Projection;
+
     protected: // TO:DO - Study OOPS
     void Render(); 
 

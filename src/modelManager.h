@@ -25,6 +25,10 @@ class ModelManager{
     void AddModel(const std::string& objPath);
     void DrawAll(Shader* shader, Shader* outlineShader);
 
+    glm::mat4& GetSelectedModel(){
+        return m_ModelMats[selectedModel - 1];
+    }
+    
     size_t selectedModel = 0;
 };
 

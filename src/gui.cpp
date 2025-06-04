@@ -21,7 +21,7 @@ GUI::~GUI(){
     ImGui::DestroyContext();
 }
 
-void GUI::Render(ModelManager* modelManager){
+void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::mat4& projection, int width, int height){
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -53,6 +53,24 @@ void GUI::Render(ModelManager* modelManager){
         ImGui::EndMainMenuBar();
     }
     
+    if (modelManager->selectedModel != 0){
+        ImGuizmo::BeginFrame();
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
+        ImGuizmo::SetRect(0, 0, width, height);
+
+        glm::mat4& model = modelManager->GetSelectedModel();
+
+        ImGuizmo::Manipulate(
+            glm::value_ptr(view), 
+            glm::value_ptr(projection),
+            ImGuizmo::TRANSLATE, 
+            ImGuizmo::WORLD,
+            glm::value_ptr(model),
+            nullptr, 
+            nullptr
+        );
+    }
     
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

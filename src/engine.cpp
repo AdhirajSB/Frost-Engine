@@ -37,7 +37,9 @@ void Engine::Loop(){
         // Draw everything
         m_Camera->Update(deltaTime);
         Render();
-        m_Gui->Render(m_ModelManager);
+        int width, height;
+        glfwGetWindowSize(m_Window->GetWindow(), &width, &height);
+        m_Gui->Render(m_ModelManager, m_View, m_Projection, width, height);
 
         m_Window->SwapBuffers();
         m_Window->Poll();
@@ -49,11 +51,11 @@ void Engine::Render(){
     glfwGetFramebufferSize(m_Window->GetWindow(), &m_Width, &m_Height); 
     glViewport(0, 0, m_Width, m_Height);
 
-    glm::mat4 view = m_Camera->ViewMatrix();
-    glm::mat4 projection = m_Camera->ProjectionMatrix((float)m_Width/m_Height);
+    m_View = m_Camera->ViewMatrix();
+    m_Projection = m_Camera->ProjectionMatrix((float)m_Width/m_Height);
 
-    m_PickShader->SetMat4("view", view);
-    m_PickShader->SetMat4("projection", projection);
+    m_PickShader->SetMat4("view", m_View);
+    m_PickShader->SetMat4("projection", m_Projection);
 
     m_ModelManager->Clear();
     m_ModelManager->DrawPicking(m_PickShader);
@@ -78,10 +80,10 @@ void Engine::Render(){
         m_ModelManager->DisablePicking();
     }
 
-    m_Shader->SetMat4("view", view);
-    m_Shader->SetMat4("projection", projection);
-    m_OutlineShader->SetMat4("view", view);
-    m_OutlineShader->SetMat4("projection", projection);
+    m_Shader->SetMat4("view", m_View);
+    m_Shader->SetMat4("projection", m_Projection);
+    m_OutlineShader->SetMat4("view", m_View);
+    m_OutlineShader->SetMat4("projection", m_Projection);
 
     m_ModelManager->DrawAll(m_Shader, m_OutlineShader);
 }
