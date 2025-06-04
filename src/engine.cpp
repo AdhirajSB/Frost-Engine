@@ -54,6 +54,8 @@ void Engine::Render(){
 
     m_PickShader->SetMat4("view", view);
     m_PickShader->SetMat4("projection", projection);
+
+    m_ModelManager->Clear();
     m_ModelManager->DrawPicking(m_PickShader);
     
     if (glfwGetMouseButton(m_Window->GetWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){

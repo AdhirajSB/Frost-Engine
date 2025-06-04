@@ -17,6 +17,7 @@ class ModelManager{
     ModelManager();
 
     void InitFB();
+    void Clear();
     void EnablePicking();
     void DisablePicking();
     void DrawPicking(Shader* pickShader);

@@ -30,6 +30,13 @@ void ModelManager::InitFB(){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void ModelManager::Clear(){
+    EnablePicking();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    DisablePicking();
+}
+
 void ModelManager::EnablePicking(){
     glBindFramebuffer(GL_FRAMEBUFFER, m_Fbo);
 }
