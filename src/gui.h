@@ -11,7 +11,9 @@
 class GUI{
     private:
     GLFWwindow* m_Window;
-    bool m_ShowDemoWindow = true;
+    bool m_ShowDemoWindow = false;
+
+    ImGuizmo::OPERATION m_CurrentGizmoOperation;
 
     public:
     GUI(GLFWwindow* window);

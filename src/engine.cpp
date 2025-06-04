@@ -76,7 +76,9 @@ void Engine::Render(){
         unsigned int pixel;
         glReadPixels(mouseX, m_Height - mouseY, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &pixel);
 
-        m_ModelManager->selectedModel = (size_t)pixel;
+        if (pixel)
+            m_ModelManager->selectedModel = (size_t)pixel;
+        
         m_ModelManager->DisablePicking();
     }
 

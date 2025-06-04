@@ -29,7 +29,7 @@ class ModelManager{
         return m_ModelMats[selectedModel - 1];
     }
     
-    size_t selectedModel = 0;
+    size_t selectedModel = 1;
 };
 
 #endif

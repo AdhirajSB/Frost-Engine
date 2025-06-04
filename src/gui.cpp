@@ -13,6 +13,8 @@ GUI::GUI(GLFWwindow *window): m_Window(window){
     
     ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
     ImGui_ImplOpenGL3_Init("#version 410");
+
+    m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
 }
 
 GUI::~GUI(){
@@ -52,6 +54,21 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
         }
         ImGui::EndMainMenuBar();
     }
+
+    ImGui::Begin("Gizmo Controls");
+    ImGui::Text("Selected Model: %zu", modelManager->selectedModel);
+    if (ImGui::RadioButton("Translate", m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)) {
+        m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Rotate", m_CurrentGizmoOperation == ImGuizmo::ROTATE)) {
+        m_CurrentGizmoOperation = ImGuizmo::ROTATE;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Scale", m_CurrentGizmoOperation == ImGuizmo::SCALE)) {
+        m_CurrentGizmoOperation = ImGuizmo::SCALE;
+    }
+    ImGui::End();
     
     if (modelManager->selectedModel != 0){
         ImGuizmo::BeginFrame();
@@ -64,7 +81,7 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
         ImGuizmo::Manipulate(
             glm::value_ptr(view), 
             glm::value_ptr(projection),
-            ImGuizmo::TRANSLATE, 
+            m_CurrentGizmoOperation,
             ImGuizmo::WORLD,
             glm::value_ptr(model),
             nullptr, 
