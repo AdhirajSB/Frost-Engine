@@ -24,6 +24,8 @@ Window::Window(int width, int height, const std::string &title): m_Window(nullpt
         return;
     }
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 Window::~Window(){

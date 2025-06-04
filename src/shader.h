@@ -157,6 +157,12 @@ class Shader{
         glUniform1i(location, value);
     }
 
+    void SetUInt(const std::string& name, unsigned int value){
+        IsBound();
+        unsigned int location = GetUniformLocation(name);
+        glUniform1ui(location, value);
+    }
+
     void SetBool(const std::string &name, bool value){
         IsBound();
         unsigned int location = GetUniformLocation(name);

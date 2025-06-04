@@ -3,6 +3,8 @@
 Engine::Engine(const std::string& title){
     m_Window = new Window(1600, 900, title);
     m_Shader = new Shader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
+    m_PickShader = new Shader("res/shaders/objInfoVS.glsl", "res/shaders/objInfoFS.glsl");
+    m_OutlineShader = new Shader("res/shaders/outlineVS.glsl", "res/shaders/outlineFS.glsl");
     m_ModelManager = new ModelManager;
     m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 0.8f, -3.0f));
     m_Gui = new GUI(m_Window->GetWindow());
@@ -11,6 +13,8 @@ Engine::Engine(const std::string& title){
 Engine::~Engine(){
     delete m_Window;
     delete m_Shader;
+    delete m_PickShader;
+    delete m_OutlineShader;
     delete m_ModelManager;
     delete m_Camera;
     delete m_Gui;
@@ -23,7 +27,7 @@ void Engine::Loop(){
     float lastFrame = 0.0f;
 
     while (!m_Window->ShouldClose()){
-        m_Window->ClearColor(0.1, 0.1, 0.1);
+        m_Window->Clear();
 
         // Evaluate deltaTime for camera movements
         float currFrame = static_cast<float>(glfwGetTime());
@@ -45,9 +49,37 @@ void Engine::Render(){
     glfwGetFramebufferSize(m_Window->GetWindow(), &m_Width, &m_Height); 
     glViewport(0, 0, m_Width, m_Height);
 
+    glm::mat4 view = m_Camera->ViewMatrix();
+    glm::mat4 projection = m_Camera->ProjectionMatrix((float)m_Width/m_Height);
 
-    m_Shader->Use();
-    m_Shader->SetMat4("view", m_Camera->ViewMatrix());
-    m_Shader->SetMat4("projection", m_Camera->ProjectionMatrix((float)m_Width/m_Height));
-    m_ModelManager->DrawAll(*m_Shader);
+    m_PickShader->SetMat4("view", view);
+    m_PickShader->SetMat4("projection", projection);
+    m_ModelManager->DrawPicking(m_PickShader);
+    
+    if (glfwGetMouseButton(m_Window->GetWindow(), GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS){
+        m_ModelManager->EnablePicking();
+
+        double mouseX, mouseY;
+        glfwGetCursorPos(m_Window->GetWindow(), &mouseX, &mouseY);
+
+        int winWidth, winHeight;
+        glfwGetWindowSize(m_Window->GetWindow(), &winWidth, &winHeight);
+
+        mouseX *= (double)m_Width/winWidth;
+        mouseY *= (double)m_Height/winHeight;
+
+        glReadBuffer(GL_COLOR_ATTACHMENT0);
+        unsigned int pixel[3] = {};
+        glReadPixels(mouseX, m_Height - mouseY, 1, 1, GL_RGB_INTEGER, GL_UNSIGNED_INT, &pixel);
+
+        m_ModelManager->selectedModel = (size_t)pixel[0];
+        m_ModelManager->DisablePicking();
+    }
+
+    m_Shader->SetMat4("view", view);
+    m_Shader->SetMat4("projection", projection);
+    m_OutlineShader->SetMat4("view", view);
+    m_OutlineShader->SetMat4("projection", projection);
+
+    m_ModelManager->DrawAll(m_Shader, m_OutlineShader);
 }
