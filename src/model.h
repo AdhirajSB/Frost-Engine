@@ -10,7 +10,7 @@
 #include <GLM/glm.hpp>
 #include <vector>
 #include <unordered_map>
-
+#include <stb_image/stb_image.h>
 #include "shader.h"
 
 
@@ -27,6 +27,14 @@ struct Material{
     glm::vec3 emissiveColor = glm::vec3(0.0f);
 
     float alpha = 1.0f;
+
+    unsigned int diffuseTexture = 0;
+    unsigned int normalTexture = 0;
+    unsigned int alphaTexture = 0;
+
+    bool hasDiffuseTexture = false;
+    bool hasNormalTexture = false;
+    bool hasAlphaTexture = false;
 };
 
 class Model{

@@ -7,6 +7,8 @@ Model::Model(const std::string &objPath){
     if (!fileOBJ.is_open()){
         throw std::runtime_error("Failed to open file at: " + objPath);
     }
+
+    stbi_set_flip_vertically_on_load(true);
     LoadMTL(objPath);
 
     std::vector<glm::vec3> positions;
@@ -77,6 +79,55 @@ Model::Model(const std::string &objPath){
     SetupBuffers();
 }
 
+unsigned int LoadTextureFromFile(const std::string& mapPath){
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(mapPath.c_str(), &width, &height, &nrComponents, 0);
+    if (data){
+        GLenum format = 0;
+        GLenum internalFormat = 0;
+
+        if (nrComponents == 4) {
+            format = GL_RGBA;
+            internalFormat = GL_RGBA8;
+        }
+        else if (nrComponents == 3){
+            format = GL_RGB;
+            internalFormat = GL_RGB8;
+        }
+        else if (nrComponents == 1) {
+            format = GL_RED;
+            internalFormat = GL_R8;
+        }
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+        GLenum error = glGetError();
+        if (error != GL_NO_ERROR) {
+            std::cerr << "glTexImage2D failed with error: 0x" << std::hex << error << std::dec << std::endl;
+        }
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else{
+        stbi_image_free(data);
+        throw std::runtime_error("Texture failed to load at path: " + mapPath);
+    }
+        
+    glBindTexture(GL_TEXTURE_2D, 0);
+    return textureID;
+}
+
 void Model::LoadMTL(std::string mtlPath){
     int size = mtlPath.length();
     mtlPath[size - 3] = 'm';
@@ -122,6 +173,21 @@ void Model::LoadMTL(std::string mtlPath){
             float alpha; iss >> alpha;
             m_MaterialProperty[m_CurrentMaterial].alpha = alpha;
         }
+        else if (prefix == "map_Kd"){
+            std::string path; iss >> path;
+            m_MaterialProperty[m_CurrentMaterial].diffuseTexture = LoadTextureFromFile(path);
+            m_MaterialProperty[m_CurrentMaterial].hasDiffuseTexture = true;
+        }
+        else if (prefix == "map_d"){
+            std::string path; iss >> path;
+            m_MaterialProperty[m_CurrentMaterial].alphaTexture = LoadTextureFromFile(path);
+            m_MaterialProperty[m_CurrentMaterial].hasAlphaTexture = true;
+        }
+        else if (prefix == "map_Bump"){
+            std::string path; iss >> path;
+            m_MaterialProperty[m_CurrentMaterial].normalTexture = LoadTextureFromFile(path);
+            m_MaterialProperty[m_CurrentMaterial].hasNormalTexture = true;
+        }
     }
 }
 
@@ -152,14 +218,41 @@ void Model::SetupBuffers(){
 
 void Model::Draw(Shader* shader){
     for (const auto& [material, vertices]: m_MaterialGroup){
-        shader->SetVec3("ambientColor", m_MaterialProperty.at(material).ambientColor);
-        shader->SetVec3("diffuseColor", m_MaterialProperty.at(material).diffuseColor);
-        shader->SetVec3("specularColor", m_MaterialProperty.at(material).specularColor);
-        shader->SetVec3("emissiveColor", m_MaterialProperty.at(material).emissiveColor);
-        shader->SetFloat("alpha", m_MaterialProperty.at(material).alpha);
+        const Material& mat = m_MaterialProperty.at(material);
         
+        shader->SetVec3("ambientColor", mat.ambientColor);
+        shader->SetVec3("diffuseColor", mat.diffuseColor);
+        shader->SetVec3("specularColor", mat.specularColor);
+        shader->SetVec3("emissiveColor", mat.emissiveColor);
+        shader->SetFloat("alpha", mat.alpha);
+        
+        shader->SetBool("hasDiffuseTexture", mat.hasDiffuseTexture);
+        shader->SetBool("hasAlphaTexture", mat.hasAlphaTexture);
+        shader->SetBool("hasNormalTexture", mat.hasNormalTexture);
+
+        if (mat.hasDiffuseTexture){
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mat.diffuseTexture);
+            shader->SetInt("diffuseTexture", 0);
+        }
+        if (mat.hasAlphaTexture){
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mat.alphaTexture);
+            shader->SetInt("alphaTexture", 1);
+        }
+        if (mat.hasNormalTexture){
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, mat.normalTexture);
+            shader->SetInt("normalTexture", 2);
+        }
+
         glBindVertexArray(m_RenderID.at(material));
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+        for (int i = 0; i < 3; i++){
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
     }
 }
 
