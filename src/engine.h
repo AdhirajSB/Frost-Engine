@@ -6,6 +6,7 @@
 #include "modelManager.h"
 #include "camera.h"
 #include "gui.h"
+#include "gridlines.h"
 
 class Engine{
     private:
@@ -16,6 +17,7 @@ class Engine{
     ModelManager* m_ModelManager;
     Camera* m_Camera;
     GUI* m_Gui;
+    Grid* m_Grid;
     
     int m_Width;
     int m_Height;

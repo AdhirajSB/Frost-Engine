@@ -8,6 +8,7 @@ Engine::Engine(const std::string& title){
     m_ModelManager = new ModelManager;
     m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 1.2f, -5.0f));
     m_Gui = new GUI(m_Window->GetWindow());
+    m_Grid = new Grid(5.0f, 1.0f);
 }
 
 Engine::~Engine(){
@@ -18,6 +19,7 @@ Engine::~Engine(){
     delete m_ModelManager;
     delete m_Camera;
     delete m_Gui;
+    delete m_Grid;
 }
 
 
@@ -87,5 +89,7 @@ void Engine::Render(){
     m_OutlineShader->SetMat4("view", m_View);
     m_OutlineShader->SetMat4("projection", m_Projection);
 
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    m_Grid->Draw(m_View, m_Projection);
     m_ModelManager->DrawAll(m_Shader, m_OutlineShader);
 }
