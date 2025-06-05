@@ -1,19 +1,14 @@
 #include "modelManager.h"
 #include "gui.h"
 
-
 GUI::GUI(GLFWwindow *window): m_Window(window){
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    
     ImGuiIO& io = ImGui::GetIO();
-    (void)io;
-
+    io.Fonts->AddFontFromFileTTF("res/fonts/DroidSans.ttf", 16.0f);
     ImGui::StyleColorsDark();
-    
     ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
     ImGui_ImplOpenGL3_Init("#version 410");
-
     m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
 }
 
@@ -27,12 +22,26 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-
-    // Main ->
+    
+    
+    ImGuiIO& io = ImGui::GetIO();
+    if (!io.WantCaptureKeyboard) { // Only process when ImGui doesn't need keyboard input
+        if (ImGui::IsKeyPressed(ImGuiKey_G)) {
+            m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+        }
+        else if (ImGui::IsKeyPressed(ImGuiKey_R)) {
+            m_CurrentGizmoOperation = ImGuizmo::ROTATE;
+        }
+        else if (ImGui::IsKeyPressed(ImGuiKey_E)) {
+            m_CurrentGizmoOperation = ImGuizmo::SCALE;
+        }
+    }
+    
+    // Main Menu Bar
     if (m_ShowDemoWindow){
         ImGui::ShowDemoWindow(&m_ShowDemoWindow);
     }
-
+    
     if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")){
             if (ImGui::MenuItem("Import Model")){
@@ -54,9 +63,14 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
         }
         ImGui::EndMainMenuBar();
     }
-
+    
     ImGui::Begin("Gizmo Controls");
-    ImGui::Text("Selected Model: %zu", modelManager->selectedModel);
+    ImGui::Text("Keyboard Shortcuts:");
+    ImGui::Text("G - Translate");
+    ImGui::Text("R - Rotate");
+    ImGui::Text("E - Scale");
+    ImGui::Separator();
+    
     if (ImGui::RadioButton("Translate", m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)) {
         m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
     }
@@ -75,16 +89,15 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
         ImGuizmo::SetOrthographic(false);
         ImGuizmo::SetDrawlist(ImGui::GetBackgroundDrawList());
         ImGuizmo::SetRect(0, 0, width, height);
-
+        
         glm::mat4& model = modelManager->GetSelectedModel();
-
         ImGuizmo::Manipulate(
-            glm::value_ptr(view), 
+            glm::value_ptr(view),
             glm::value_ptr(projection),
             m_CurrentGizmoOperation,
             ImGuizmo::WORLD,
             glm::value_ptr(model),
-            nullptr, 
+            nullptr,
             nullptr
         );
     }

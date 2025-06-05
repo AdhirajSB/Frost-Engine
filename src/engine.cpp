@@ -1,14 +1,14 @@
 #include "engine.h"
 
 Engine::Engine(const std::string& title){
-    m_Window = new Window(1600, 900, title);
+    m_Window = new Window(1920, 1200, title);
     m_Shader = new Shader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
     m_PickShader = new Shader("res/shaders/objInfoVS.glsl", "res/shaders/objInfoFS.glsl");
     m_OutlineShader = new Shader("res/shaders/outlineVS.glsl", "res/shaders/outlineFS.glsl");
     m_ModelManager = new ModelManager;
     m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 1.2f, -5.0f));
     m_Gui = new GUI(m_Window->GetWindow());
-    m_Grid = new Grid(5.0f, 1.0f);
+    m_Grid = new Grid(8.0f, 0.5f);
 }
 
 Engine::~Engine(){
