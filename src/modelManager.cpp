@@ -51,7 +51,7 @@ void ModelManager::DrawPicking(Shader* pickShader){
         pickShader->SetMat4("model", m_ModelMats[i]);
         pickShader->SetUInt("objectID", static_cast<unsigned int>(i + 1));
 
-        m_Models[i]->Draw();
+        m_Models[i]->DrawPicking();
     }
     DisablePicking();
 }
@@ -64,11 +64,13 @@ void ModelManager::AddModel(const std::string &objPath)
 
 void ModelManager::DrawAll(Shader* shader, Shader* outlineShader){
     for (size_t i = 0; i < m_Models.size(); i++){
-        if (i + 1 == selectedModel)
+        if (i + 1 == selectedModel){
             outlineShader->SetMat4("model", m_ModelMats[i]);
-        else
+            m_Models[i]->Draw(outlineShader);
+        }
+        else{
             shader->SetMat4("model", m_ModelMats[i]);
-        
-        m_Models[i]->Draw();
+            m_Models[i]->Draw(shader);
+        }
     }
 }

@@ -9,6 +9,9 @@
 
 #include <GLM/glm.hpp>
 #include <vector>
+#include <unordered_map>
+
+#include "shader.h"
 
 
 struct Vertex{
@@ -17,17 +20,31 @@ struct Vertex{
     glm::vec2 uvCoord;
 };
 
+struct Material{
+    glm::vec3 ambientColor = glm::vec3(1.0f);
+    glm::vec3 diffuseColor = glm::vec3(1.0f);
+    glm::vec3 specularColor = glm::vec3(1.0f);
+    glm::vec3 emissiveColor = glm::vec3(0.0f);
+
+    float alpha = 1.0f;
+};
+
 class Model{
     private:
-    unsigned int m_VAO;
-    unsigned int m_VBO;
-    int m_vertexCount;
 
-    void SetupBuffers(const std::vector<Vertex>& vertices);
+    std::string m_CurrentMaterial;
+    std::unordered_map<std::string, unsigned int> m_RenderID;
+    std::unordered_map<std::string, Material> m_MaterialProperty;
+    std::unordered_map<std::string, std::vector<Vertex>> m_MaterialGroup;
+
+    void LoadMTL(std::string mtlPath);
+    void SetupBuffers();
 
     public:
     Model(const std::string& objPath);
-    void Draw() const;
+
+    void Draw(Shader* shader);
+    void DrawPicking() const;
 };
 
 #endif
