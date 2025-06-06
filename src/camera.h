@@ -33,6 +33,9 @@ class Camera{
     inline glm::mat4 ProjectionMatrix(float aspectRatio) const{
         return glm::perspective(glm::radians(m_Fov), aspectRatio, 0.1f, 100.0f);
     }
+    inline glm::vec3 CameraPos() const{
+        return m_Position;
+    }
 
     void Update(float deltaTime);
 };

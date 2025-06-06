@@ -56,21 +56,20 @@ void ModelManager::DrawPicking(Shader* pickShader){
     DisablePicking();
 }
 
-void ModelManager::AddModel(const std::string &objPath)
-{
+void ModelManager::AddModel(const std::string &objPath){
     m_Models.push_back(std::make_unique<Model>(objPath));
     m_ModelMats.push_back(glm::mat4(1.0f));
 }
 
-void ModelManager::DrawAll(Shader* shader, Shader* outlineShader){
+void ModelManager::DrawAll(Camera* camera, Shader* shader){
+    shader->SetVec3("lightPos", m_LightPos);
+    shader->SetVec3("lightCol", m_LightCol);
+    shader->SetFloat("constant", m_Constant);
+    shader->SetFloat("linear", m_Linear);
+    shader->SetFloat("quadratic", m_Quadratic);
+
     for (size_t i = 0; i < m_Models.size(); i++){
-        if (i + 1 == selectedModel){
-            outlineShader->SetMat4("model", m_ModelMats[i]);
-            m_Models[i]->Draw(outlineShader);
-        }
-        else{
-            shader->SetMat4("model", m_ModelMats[i]);
-            m_Models[i]->Draw(shader);
-        }
+        shader->SetMat4("model", m_ModelMats[i]);
+        m_Models[i]->Draw(camera, shader);
     }
 }

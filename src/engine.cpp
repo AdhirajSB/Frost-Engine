@@ -4,18 +4,16 @@ Engine::Engine(const std::string& title){
     m_Window = new Window(1920, 1200, title);
     m_Shader = new Shader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
     m_PickShader = new Shader("res/shaders/objInfoVS.glsl", "res/shaders/objInfoFS.glsl");
-    m_OutlineShader = new Shader("res/shaders/outlineVS.glsl", "res/shaders/outlineFS.glsl");
     m_ModelManager = new ModelManager;
     m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 1.2f, -5.0f));
     m_Gui = new GUI(m_Window->GetWindow());
-    m_Grid = new Grid(8.0f, 0.5f);
+    m_Grid = new Grid(8.0f, 1.0f);
 }
 
 Engine::~Engine(){
     delete m_Window;
     delete m_Shader;
     delete m_PickShader;
-    delete m_OutlineShader;
     delete m_ModelManager;
     delete m_Camera;
     delete m_Gui;
@@ -86,10 +84,8 @@ void Engine::Render(){
 
     m_Shader->SetMat4("view", m_View);
     m_Shader->SetMat4("projection", m_Projection);
-    m_OutlineShader->SetMat4("view", m_View);
-    m_OutlineShader->SetMat4("projection", m_Projection);
 
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     m_Grid->Draw(m_View, m_Projection);
-    m_ModelManager->DrawAll(m_Shader, m_OutlineShader);
+    m_ModelManager->DrawAll(m_Camera, m_Shader);
 }

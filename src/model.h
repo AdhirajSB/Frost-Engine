@@ -11,7 +11,9 @@
 #include <vector>
 #include <unordered_map>
 #include <stb_image/stb_image.h>
+
 #include "shader.h"
+#include "camera.h"
 
 
 struct Vertex{
@@ -21,6 +23,8 @@ struct Vertex{
 };
 
 struct Material{
+    float specularExponent = 0.0f;
+    
     glm::vec3 ambientColor = glm::vec3(1.0f);
     glm::vec3 diffuseColor = glm::vec3(1.0f);
     glm::vec3 specularColor = glm::vec3(1.0f);
@@ -39,7 +43,6 @@ struct Material{
 
 class Model{
     private:
-
     std::string m_CurrentMaterial;
     std::unordered_map<std::string, unsigned int> m_RenderID;
     std::unordered_map<std::string, Material> m_MaterialProperty;
@@ -51,7 +54,8 @@ class Model{
     public:
     Model(const std::string& objPath);
 
-    void Draw(Shader* shader);
+    void Draw(Camera* camera, Shader* shader);
+    void DrawOutline(Shader* outlineShader);
     void DrawPicking() const;
 };
 

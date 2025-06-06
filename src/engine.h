@@ -13,7 +13,6 @@ class Engine{
     Window* m_Window;
     Shader* m_Shader;
     Shader* m_PickShader;
-    Shader* m_OutlineShader;
     ModelManager* m_ModelManager;
     Camera* m_Camera;
     GUI* m_Gui;

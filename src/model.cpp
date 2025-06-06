@@ -149,6 +149,10 @@ void Model::LoadMTL(std::string mtlPath){
         if (prefix == "newmtl"){
             iss >> m_CurrentMaterial;
         }
+        else if (prefix == "Na"){
+            float shininess; iss >> shininess;
+            m_MaterialProperty[m_CurrentMaterial].specularExponent = shininess;
+        }
         else if (prefix == "Ka"){
             float r, g, b;
             iss >> r >> g >> b;
@@ -216,10 +220,11 @@ void Model::SetupBuffers(){
     }
 }
 
-void Model::Draw(Shader* shader){
+void Model::Draw(Camera* camera, Shader *shader){
     for (const auto& [material, vertices]: m_MaterialGroup){
         const Material& mat = m_MaterialProperty.at(material);
         
+        shader->SetFloat("specularExponent", mat.specularExponent);
         shader->SetVec3("ambientColor", mat.ambientColor);
         shader->SetVec3("diffuseColor", mat.diffuseColor);
         shader->SetVec3("specularColor", mat.specularColor);
@@ -229,6 +234,8 @@ void Model::Draw(Shader* shader){
         shader->SetBool("hasDiffuseTexture", mat.hasDiffuseTexture);
         shader->SetBool("hasAlphaTexture", mat.hasAlphaTexture);
         shader->SetBool("hasNormalTexture", mat.hasNormalTexture);
+
+        shader->SetVec3("cameraPos", camera->CameraPos());
 
         if (mat.hasDiffuseTexture){
             glActiveTexture(GL_TEXTURE0);
@@ -253,6 +260,14 @@ void Model::Draw(Shader* shader){
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(GL_TEXTURE_2D, 0);
         }
+    }
+}
+
+void Model::DrawOutline(Shader *outlineShader){
+    outlineShader->Use();
+    for (const auto& [material, vertices]: m_MaterialGroup){
+        glBindVertexArray(m_RenderID.at(material));
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     }
 }
 

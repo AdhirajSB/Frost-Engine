@@ -5,6 +5,7 @@ GUI::GUI(GLFWwindow *window): m_Window(window){
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;  // Enable docking
     io.Fonts->AddFontFromFileTTF("res/fonts/DroidSans.ttf", 16.0f);
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
@@ -22,8 +23,28 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    
-    
+
+    // ImGUI dockspace
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGuiWindowFlags host_window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+                                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                                        ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus |
+                                        ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoBackground;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::Begin("DockSpaceHostWindow", nullptr, host_window_flags);
+    ImGui::PopStyleVar(2);
+
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::End();
+
+
     ImGuiIO& io = ImGui::GetIO();
     if (!io.WantCaptureKeyboard) { // Only process when ImGui doesn't need keyboard input
         if (ImGui::IsKeyPressed(ImGuiKey_G)) {
@@ -63,7 +84,24 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
         }
         ImGui::EndMainMenuBar();
     }
-    
+
+    static glm::vec3 lightPos = glm::vec3(0.0f);
+    static glm::vec3 lightCol = glm::vec3(1.0f);
+    static float a = 1.0f;
+    static float b = 0.14f;
+    static float c = 0.07f;
+    ImGui::Begin("Light Controls");
+    ImGui::SliderFloat3("Position:", glm::value_ptr(lightPos), -10.0f, 10.0f);
+    ImGui::Separator();
+    ImGui::ColorPicker3("Color", glm::value_ptr(lightCol), ImGuiColorEditFlags_PickerHueWheel);
+    ImGui::Separator();
+    ImGui::SliderFloat("Base Intensity", &a, 0.0f, 2.0f);
+    ImGui::SliderFloat("Falloff Start", &b, 0.0f, 1.0f);
+    ImGui::SliderFloat("Falloff Sharpness", &c, 0.0f, 1.0f);
+
+    ImGui::End();
+    modelManager->SetupLights(lightPos, lightCol, a, b, c);
+
     ImGui::Begin("Gizmo Controls");
     ImGui::Text("Keyboard Shortcuts:");
     ImGui::Text("G - Translate");
