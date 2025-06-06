@@ -3,6 +3,7 @@
 in vec3 Pos;
 in vec3 Normal;
 in vec2 TexCoords;
+in vec3 Tangent;
 
 uniform vec3 ambientColor;
 uniform vec3 diffuseColor;
@@ -19,8 +20,8 @@ uniform bool hasDiffuseTexture;
 uniform bool hasAlphaTexture;
 uniform bool hasNormalTexture;
 
-uniform vec3 lightPos = vec3(0.0, 0.0, 0.0);
-uniform vec3 lightCol = vec3(1.0, 1.0, 1.0);
+uniform vec3 lightPos;
+uniform vec3 lightCol;
 uniform vec3 cameraPos;
 
 uniform float constant = 1.0;
@@ -30,25 +31,39 @@ uniform float quadratic = 0.07;
 out vec4 fragColor;
 
 void main(){
-    // Effective textures
-    vec3 effectiveDiffuse = hasDiffuseTexture ? texture(diffuseTexture, TexCoords).rgb : diffuseColor;
+    // Final alpha
     float effectiveAlpha = alpha;
     if (hasAlphaTexture) {
         effectiveAlpha *= texture(alphaTexture, TexCoords).a;
     }
     if (effectiveAlpha < 0.1) discard;
 
-    // Normalized vectors
+    // Base color
+    vec3 effectiveDiffuse = hasDiffuseTexture ? texture(diffuseTexture, TexCoords).rgb : diffuseColor;
+
+    // === TBN matrix ===
+    vec3 T = normalize(Tangent);
     vec3 N = normalize(Normal);
-    vec3 L = normalize(lightPos - Pos);  
-    vec3 V = normalize(cameraPos - Pos); 
-    vec3 R = reflect(-L, N);              
+    vec3 B = normalize(cross(N, T)); // Bitangent (T x N)
 
-    // Lighting terms
-    float diff = max(dot(N, L), 0.0);
+    mat3 TBN = mat3(T, B, N);
 
-    float effectiveShininess = clamp((specularExponent/1000.0) * 256.0, 1.0, 256.0);
+    // === Normal Mapping ===
+    vec3 mappedNormal = N;
+    if (hasNormalTexture) {
+        vec3 normalSample = texture(normalTexture, TexCoords).rgb;
+        normalSample = normalSample * 2.0 - 1.0; // [0,1] → [-1,1]
+        mappedNormal = normalize(TBN * normalSample);
+    }
+
+    vec3 L = normalize(lightPos - Pos);
+    vec3 V = normalize(cameraPos - Pos);
+    vec3 R = reflect(-L, mappedNormal);
+
+    // Lighting components
+    float diff = max(dot(mappedNormal, L), 0.0);
     float spec = 0.0;
+    float effectiveShininess = clamp((specularExponent / 1000.0) * 256.0, 1.0, 256.0);
     if (diff > 0.0) {
         spec = pow(max(dot(V, R), 0.0), effectiveShininess);
     }
@@ -56,11 +71,10 @@ void main(){
     float distance = length(lightPos - Pos);
     float attenuation = 1.0 / (constant + linear * distance + quadratic * distance * distance);
 
-    vec3 ambient = 0.01 * ambientColor * effectiveDiffuse;
+    vec3 ambient = 0.1 * ambientColor * effectiveDiffuse;
     vec3 diffuse = lightCol * effectiveDiffuse * diff * attenuation;
     vec3 specular = lightCol * specularColor * spec * attenuation;
 
     vec3 linearColor = ambient + diffuse + specular + emissiveColor;
-    vec3 gammaCorrected = pow(linearColor, vec3(1.0 / 2.2));
-    fragColor = vec4(gammaCorrected, effectiveAlpha);
+    fragColor = vec4(linearColor, effectiveAlpha);
 }

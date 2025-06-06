@@ -20,6 +20,7 @@ struct Vertex{
     glm::vec3 pos;
     glm::vec3 norm;
     glm::vec2 uvCoord;
+    glm::vec3 tangent;
 };
 
 struct Material{

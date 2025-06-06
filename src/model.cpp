@@ -41,33 +41,42 @@ Model::Model(const std::string &objPath){
         else if (prefix == "usemtl"){
             iss >> m_CurrentMaterial;
         }
-        else if (prefix == "f"){
+        else if (prefix == "f") {
             std::string vertexStr;
 
-            Vertex triangle[3]; // Iterate over 3 vertices to get a triangle
-            for (int i = 0; i < 3; i++){
+            Vertex triangle[3];
+            for (int i = 0; i < 3; i++) {
                 iss >> vertexStr;
-
                 std::istringstream viss(vertexStr);
                 std::string indStr;
 
                 int posIndex(-1), uvIndex(-1), normIndex(-1);
-                if (std::getline(viss, indStr, '/') && !indStr.empty()){
+                if (std::getline(viss, indStr, '/') && !indStr.empty())
                     posIndex = std::stoi(indStr) - 1;
-                }
-                if (std::getline(viss, indStr, '/') && !indStr.empty()){
+                if (std::getline(viss, indStr, '/') && !indStr.empty())
                     uvIndex = std::stoi(indStr) - 1;
-                }
-                if (std::getline(viss, indStr, '/') && !indStr.empty()){
+                if (std::getline(viss, indStr, '/') && !indStr.empty())
                     normIndex = std::stoi(indStr) - 1;
-                }
 
                 if (posIndex != -1) triangle[i].pos = positions[posIndex];
                 if (uvIndex != -1) triangle[i].uvCoord = uvs[uvIndex];
                 if (normIndex != -1) triangle[i].norm = normals[normIndex];
             }
 
-            for (int i = 0; i < 3; i++){
+            // === Tangent Calculation ===
+            glm::vec3 edge1 = triangle[1].pos - triangle[0].pos;
+            glm::vec3 edge2 = triangle[2].pos - triangle[0].pos;
+
+            glm::vec2 deltaUV1 = triangle[1].uvCoord - triangle[0].uvCoord;
+            glm::vec2 deltaUV2 = triangle[2].uvCoord - triangle[0].uvCoord;
+
+            float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+            glm::vec3 tangent = f * (deltaUV2.y * edge1 - deltaUV1.y * edge2);
+            tangent = glm::normalize(tangent);
+
+            for (int i = 0; i < 3; i++) {
+                triangle[i].tangent = tangent;
                 m_MaterialGroup[m_CurrentMaterial].push_back(triangle[i]);
             }
         }
@@ -219,6 +228,8 @@ void Model::SetupBuffers(){
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, norm));
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, uvCoord));
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, tangent));
 
         glBindVertexArray(0);
 

@@ -117,9 +117,7 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
 
     ImGui::Begin("Gizmo Controls");
     ImGui::Text("Keyboard Shortcuts:");
-    ImGui::Text("G - Translate");
-    ImGui::Text("R - Rotate");
-    ImGui::Text("E - Scale");
+    ImGui::Text("G - Translate, R - Rotate, E - Scale");
     ImGui::Separator();
     
     if (ImGui::RadioButton("Translate", m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)) {
