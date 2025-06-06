@@ -1,7 +1,7 @@
 #include "modelManager.h"
 
 ModelManager::ModelManager(){
-    AddModel("res/sampleModels/Cube/cube.obj");
+    AddModel("res/primitives/cube.obj");
     InitFB();
 }
 

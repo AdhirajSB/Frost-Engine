@@ -63,26 +63,39 @@ void GUI::Render(ModelManager* modelManager, const glm::mat4& view, const glm::m
         ImGui::ShowDemoWindow(&m_ShowDemoWindow);
     }
     
-    if (ImGui::BeginMainMenuBar()) {
-        if (ImGui::BeginMenu("File")){
-            if (ImGui::MenuItem("Import Model")){
-                const char* filters[] = {"*.obj"};
-                const char* filename = tinyfd_openFileDialog(
-                    "Choose a wavefront file",
-                    "",
-                    1,
-                    filters,
-                    "Wavefront OBJ",
-                    0
-                );
-                if (filename) modelManager->AddModel(filename);
-            }
-            if (ImGui::MenuItem("Quit")){
-                glfwSetWindowShouldClose(m_Window, true);
-            }
-            ImGui::EndMenu();
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Right)) {
+        ImGui::OpenPopup("SceneContextMenu");
+        ImGui::SetNextWindowPos(ImGui::GetMousePos());
+    }
+    if (ImGui::BeginPopup("SceneContextMenu")) {
+        if (ImGui::MenuItem("Add Cube")){
+            modelManager->AddModel("res/primitives/cube.obj");
         }
-        ImGui::EndMainMenuBar();
+        if (ImGui::MenuItem("Add Sphere")){
+            modelManager->AddModel("res/primitives/sphere.obj");
+        }
+        if (ImGui::MenuItem("Add Cylinder")){
+            modelManager->AddModel("res/primitives/cylinder.obj");
+        }
+        if (ImGui::MenuItem("Add Cone")){
+            modelManager->AddModel("res/primitives/cone.obj");
+        }
+        if (ImGui::MenuItem("Add Torus")){
+            modelManager->AddModel("res/primitives/torus.obj");
+        }
+        if (ImGui::MenuItem("Import Model")) {
+            const char* filters[] = { "*.obj" };
+            const char* filename = tinyfd_openFileDialog(
+                "Choose a Wavefront OBJ file",
+                "",
+                1,
+                filters,
+                "Wavefront OBJ",
+                0
+            );
+            if (filename) modelManager->AddModel(filename);
+        }
+        ImGui::EndPopup();
     }
 
     static glm::vec3 lightPos = glm::vec3(0.0f);
