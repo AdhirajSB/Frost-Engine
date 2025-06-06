@@ -36,6 +36,7 @@ void main(){
     if (hasAlphaTexture) {
         effectiveAlpha *= texture(alphaTexture, TexCoords).a;
     }
+    if (effectiveAlpha < 0.1) discard;
 
     // Normalized vectors
     vec3 N = normalize(Normal);

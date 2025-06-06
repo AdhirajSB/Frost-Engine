@@ -14,7 +14,7 @@ class Camera{
     const glm::vec3 m_WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
     float m_Fov = 45.0f;
-    float m_Yaw = 90.0f, m_Pitch = 0.0f;
+    float m_Yaw = -90.0f, m_Pitch = 0.0f;
     float m_Speed = 2.5f;
 
     bool m_FirstMouse = true;

@@ -3,7 +3,15 @@
 
 Camera::Camera(GLFWwindow *window, glm::vec3 cameraPos): m_Window(window), m_Position(cameraPos){
     m_Up = m_WorldUp;
-    m_Direction = glm::vec3(0.0f, 0.0f, 1.0f);
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+    direction.y = sin(glm::radians(m_Pitch));
+    direction.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+    m_Direction = glm::normalize(direction);
+
+    m_Right = glm::normalize(glm::cross(m_Direction, m_WorldUp));
+    m_Up = glm::normalize(glm::cross(m_Right, m_Direction));
 
     glfwSetWindowUserPointer(m_Window, this);
     glfwSetCursorPosCallback(m_Window, MouseMovement);

@@ -5,7 +5,7 @@ Engine::Engine(const std::string& title){
     m_Shader = new Shader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
     m_PickShader = new Shader("res/shaders/objInfoVS.glsl", "res/shaders/objInfoFS.glsl");
     m_ModelManager = new ModelManager;
-    m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 2.0f, -8.0f));
+    m_Camera = new Camera(m_Window->GetWindow(), glm::vec3(0.0f, 2.0f, 8.0f));
     m_Gui = new GUI(m_Window->GetWindow());
     m_Grid = new Grid(8.0f, 1.0f);
 }

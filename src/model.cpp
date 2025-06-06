@@ -1,4 +1,5 @@
 #include "model.h"
+#include <filesystem>
 
 
 Model::Model(const std::string &objPath){
@@ -128,16 +129,18 @@ unsigned int LoadTextureFromFile(const std::string& mapPath){
     return textureID;
 }
 
-void Model::LoadMTL(std::string mtlPath){
-    int size = mtlPath.length();
-    mtlPath[size - 3] = 'm';
-    mtlPath[size - 2] = 't';
-    mtlPath[size - 1] = 'l';
+void Model::LoadMTL(std::string objPath){
+    namespace fs = std::filesystem;
+
+    fs::path mtlPath = objPath;
+    mtlPath.replace_extension(".mtl");
 
     std::ifstream fileMTL(mtlPath);
     if (!fileMTL.is_open()){
-        throw std::runtime_error("Failed to open file at: " + mtlPath);
+        throw std::runtime_error("Failed to open file at: " + mtlPath.string());
     }
+
+    fs::path mtlDir = mtlPath.parent_path();
 
     std::string line;
     while (std::getline(fileMTL, line)){
@@ -178,18 +181,21 @@ void Model::LoadMTL(std::string mtlPath){
             m_MaterialProperty[m_CurrentMaterial].alpha = alpha;
         }
         else if (prefix == "map_Kd"){
-            std::string path; iss >> path;
-            m_MaterialProperty[m_CurrentMaterial].diffuseTexture = LoadTextureFromFile(path);
+            std::string relPath; iss >> relPath;
+            std::string fullPath = (mtlDir / relPath).string();
+            m_MaterialProperty[m_CurrentMaterial].diffuseTexture = LoadTextureFromFile(fullPath);
             m_MaterialProperty[m_CurrentMaterial].hasDiffuseTexture = true;
         }
         else if (prefix == "map_d"){
-            std::string path; iss >> path;
-            m_MaterialProperty[m_CurrentMaterial].alphaTexture = LoadTextureFromFile(path);
+            std::string relPath; iss >> relPath;
+            std::string fullPath = (mtlDir / relPath).string();
+            m_MaterialProperty[m_CurrentMaterial].alphaTexture = LoadTextureFromFile(fullPath);
             m_MaterialProperty[m_CurrentMaterial].hasAlphaTexture = true;
         }
         else if (prefix == "map_Bump"){
-            std::string path; iss >> path;
-            m_MaterialProperty[m_CurrentMaterial].normalTexture = LoadTextureFromFile(path);
+            std::string relPath; iss >> relPath;
+            std::string fullPath = (mtlDir / relPath).string();
+            m_MaterialProperty[m_CurrentMaterial].normalTexture = LoadTextureFromFile(fullPath);
             m_MaterialProperty[m_CurrentMaterial].hasNormalTexture = true;
         }
     }
